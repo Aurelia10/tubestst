@@ -28,7 +28,7 @@ database = databases.Database(DATABASE_URL)
 
 metadata = sqlalchemy.MetaData()
 
-Member = sqlalchemy.Table(
+member = sqlalchemy.Table(
     "member",
     metadata,
     sqlalchemy.Column("username", sqlalchemy.String, primary_key=True),
@@ -57,9 +57,9 @@ class Member(BaseModel):
     nama : str
     alamat : str
     no_telp : str
-    total_poin : Optional[int]
+    #total_poin : Optional[int]
 
-app = FastAPI(title = "REST API using FastAPI PostgreSQL Async EndPoints")
+app = FastAPI(title = "Tubes TST")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -75,25 +75,3 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-
-@app.get("/notes/", status_code = status.HTTP_200_OK)
-async def read_notes(skip: int = 0, take: int = 20):
-    query = notes.select().offset(skip).limit(take)
-    return await database.fetch_all(query)
-
-@app.get("/notes/{note_id}/", status_code = status.HTTP_200_OK)
-async def read_notes(note_id: int):
-    query = notes.select().where(notes.c.id == note_id)
-    return await database.fetch_one(query)
-
-@app.post("/notes/", status_code = status.HTTP_201_CREATED)
-async def create_note(note: NoteIn):
-    query = notes.insert().values(text=note.text, completed=note.completed)
-    last_record_id = await database.execute(query)
-    return {**note.dict(), "id": last_record_id}
-
-@app.put("/notes/{note_id}/", status_code = status.HTTP_200_OK)
-async def update_note(note_id: int, payload: NoteIn):
-    query = notes.update().where(notes.c.id == note_id).values(text=payload.text, completed=payload.completed)
-    await database.execute(query)
-    return {**payload.dict(), "id": note_id}
