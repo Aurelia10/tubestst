@@ -16,18 +16,27 @@ import urllib
 #db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'postgres')))
 #db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'secret')))
 #ssl_mode = urllib.parse.quote_plus(str(os.environ.get('ssl_mode','prefer')))
+host_server = 'tubes-tst.postgres.database.azure.com'
+db_server_port = '5432'
+database_name = 'Member'
+db_username = 'aureliatt@tubes-tst'
+db_password = 'Sadajiwa000'
+ssl_mode = 'prefer'
 DATABASE_URL = 'postgresql://{}:{}@{}:{}/{}?sslmode={}'.format(db_username,db_password, host_server, db_server_port, database_name, ssl_mode)
 
 database = databases.Database(DATABASE_URL)
 
 metadata = sqlalchemy.MetaData()
 
-notes = sqlalchemy.Table(
-    "notes",
+Member = sqlalchemy.Table(
+    "member",
     metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("text", sqlalchemy.String),
-    sqlalchemy.Column("completed", sqlalchemy.Boolean),
+    sqlalchemy.Column("username", sqlalchemy.String, primary_key=True),
+    sqlalchemy.Column("nama", sqlalchemy.String),
+    sqlalchemy.Column("password", sqlalchemy.String),
+    sqlalchemy.Column("alamat", sqlalchemy.String),
+    sqlalchemy.Column("no_telp", sqlalchemy.String),
+    sqlalchemy.Column("total_poin", sqlalchemy.Integer),
 )
 
 
@@ -36,14 +45,19 @@ engine = sqlalchemy.create_engine(
 )
 metadata.create_all(engine)
 
-class NoteIn(BaseModel):
-    text: str
-    completed: bool
+class MemberIn(BaseModel):
+    username : str
+    nama : str
+    password : str
+    alamat : str
+    no_telp : str
 
-class Note(BaseModel):
-    id: int
-    text: str
-    completed: bool
+class Member(BaseModel):
+    username : str
+    nama : str
+    alamat : str
+    no_telp : str
+    total_poin : Optional[int]
 
 app = FastAPI(title = "REST API using FastAPI PostgreSQL Async EndPoints")
 app.add_middleware(
